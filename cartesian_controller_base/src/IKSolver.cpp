@@ -72,7 +72,14 @@ bool IKSolver::setStartState(
     // Add additional plausibility check just in case.
     if (joint_pos_handles[i].get().get_interface_name() == hardware_interface::HW_IF_POSITION)
     {
-      m_current_positions(i) = joint_pos_handles[i].get().get_value();
+      auto opt_val = joint_pos_handles[i].get().get_optional();
+      if (opt_val.has_value()) {
+        m_current_positions(i) = opt_val.value();
+      }
+      else
+      {
+        return false;
+      }
       m_current_velocities(i) = 0.0;
       m_current_accelerations(i) = 0.0;
       m_last_positions(i) = m_current_positions(i);
@@ -96,7 +103,14 @@ void IKSolver::synchronizeJointPositions(
     // Add additional plausibility check just in case.
     if (joint_pos_handles[i].get().get_interface_name() == hardware_interface::HW_IF_POSITION)
     {
-      m_current_positions(i) = joint_pos_handles[i].get().get_value();
+      auto opt_val = joint_pos_handles[i].get().get_optional();
+      if (opt_val.has_value()) {
+        m_current_positions(i) = opt_val.value();
+      }
+      else
+      {
+        m_current_positions(i) = 0.0;
+      }
       m_last_positions(i) = m_current_positions(i);
     }
   }
