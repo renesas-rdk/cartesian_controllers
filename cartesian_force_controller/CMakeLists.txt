@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(cartesian_force_controller)
 
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
+
 set(CMAKE_CXX_STANDARD 17)
 set(ADDITIONAL_COMPILE_OPTIONS -Wall -Wextra -Wpedantic -Wno-unused-parameter)
 add_compile_options(${ADDITIONAL_COMPILE_OPTIONS})
