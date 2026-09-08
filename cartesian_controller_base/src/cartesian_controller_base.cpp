@@ -185,10 +185,11 @@ CartesianControllerBase::on_configure(const rclcpp_lifecycle::State & previous_s
   }
 
   // Parse joint limits
-  KDL::JntArray upper_pos_limits(m_joint_names.size());
-  KDL::JntArray lower_pos_limits(m_joint_names.size());
+  KDL::JntArray upper_pos_limits(static_cast<unsigned int>(m_joint_names.size()));
+  KDL::JntArray lower_pos_limits(static_cast<unsigned int>(m_joint_names.size()));
   for (size_t i = 0; i < m_joint_names.size(); ++i)
   {
+    const unsigned int idx = static_cast<unsigned int>(i);
     if (!robot_model.getJoint(m_joint_names[i]))
     {
       RCLCPP_ERROR(get_node()->get_logger(), "Joint %s does not appear in robot_description",
@@ -197,14 +198,14 @@ CartesianControllerBase::on_configure(const rclcpp_lifecycle::State & previous_s
     }
     if (robot_model.getJoint(m_joint_names[i])->type == urdf::Joint::CONTINUOUS)
     {
-      upper_pos_limits(i) = std::nan("0");
-      lower_pos_limits(i) = std::nan("0");
+      upper_pos_limits(idx) = std::nan("0");
+      lower_pos_limits(idx) = std::nan("0");
     }
     else
     {
       // Non-existent urdf limits are zero initialized
-      upper_pos_limits(i) = robot_model.getJoint(m_joint_names[i])->limits->upper;
-      lower_pos_limits(i) = robot_model.getJoint(m_joint_names[i])->limits->lower;
+      upper_pos_limits(idx) = robot_model.getJoint(m_joint_names[i])->limits->upper;
+      lower_pos_limits(idx) = robot_model.getJoint(m_joint_names[i])->limits->lower;
     }
   }
 
@@ -213,7 +214,7 @@ CartesianControllerBase::on_configure(const rclcpp_lifecycle::State & previous_s
   KDL::Tree tmp("not_relevant");
   tmp.addChain(m_robot_chain, "not_relevant");
   m_forward_kinematics_solver.reset(new KDL::TreeFkSolverPos_recursive(tmp));
-  m_iterations = get_node()->get_parameter("solver.iterations").as_int();
+  m_iterations = static_cast<int>(get_node()->get_parameter("solver.iterations").as_int());
   m_error_scale = get_node()->get_parameter("solver.error_scale").as_double();
 
   // Initialize Cartesian pd controllers

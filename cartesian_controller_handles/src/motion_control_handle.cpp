@@ -206,7 +206,7 @@ MotionControlHandle::on_configure(const rclcpp_lifecycle::State & previous_state
     new interactive_markers::InteractiveMarkerServer(get_node()->get_name(), get_node()));
   m_marker.header.frame_id = m_robot_base_link;
   m_marker.header.stamp = get_node()->now();
-  m_marker.scale = 0.1;
+  m_marker.scale = 0.1f;
   m_marker.name = "motion_control_handle";
   m_marker.pose = m_current_pose.pose;
   m_marker.description = "6D control of link: " + m_end_effector_link;
@@ -310,14 +310,15 @@ void MotionControlHandle::addAxisControl(visualization_msgs::msg::InteractiveMar
 
 geometry_msgs::msg::PoseStamped MotionControlHandle::getEndEffectorPose()
 {
-  KDL::JntArray positions(m_joint_handles.size());
+  KDL::JntArray positions(static_cast<unsigned int>(m_joint_handles.size()));
   for (size_t i = 0; i < m_joint_handles.size(); ++i)
   {
+    const unsigned int idx = static_cast<unsigned int>(i);
     auto opt_val = m_joint_handles[i].get().get_optional();
     if (opt_val.has_value()) {
-        positions(i) = opt_val.value();
+        positions(idx) = opt_val.value();
     } else {
-        positions(i) = 0.0;
+        positions(idx) = 0.0;
     }
   }
 
